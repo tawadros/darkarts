@@ -1,0 +1,15 @@
+import "hashes/mimcSponge/mimcSponge" as mimcSponge
+
+def main(private field leafDigest, private field[20] pathDigest, private bool[20] directionSelector) -> field:
+	// Setup
+	field currentDigest = leafDigest
+
+	for u32 i in 0..20 do 
+		field[2] preimage = if directionSelector[i] then [pathDigest[i], currentDigest] else [currentDigest, pathDigest[i]] fi
+		field[1] result = mimcSponge(preimage, 0f)
+		currentDigest = result[0]
+	endfor
+
+	// assert(currentDigest == rootDigest)
+
+	return currentDigest
