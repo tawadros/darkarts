@@ -1,5 +1,5 @@
 # Private NFT Transfer 🎨
-Anonymously transfer ERC-721 NFT with zero-knowledge proofs
+Anonymously transfer ERC-721 NFT with zero-knowledge proofs.
 
 ## Develop
 ### Build 
