@@ -90,12 +90,8 @@ Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_
 npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
 ```
 # TODO
-- Migrate compilation to hardhat
-    - Extend the 'compile' task to include MiMC hasher
-    - Adjust circuits compilation to the 'artifacts' folder
-        - Delete verifier contract after compile?
-    - Migrate test to ether.js and Waffle
-    - Retire the 'migrations' and 'build' folder
+- Migrate circomlib to circomlibjs
+    - Currently there's a mismatch in ffjavascript's mimcsponge?
 - Introduce proxy pattern
 - Learn how to deploy to testnet
 - Front end

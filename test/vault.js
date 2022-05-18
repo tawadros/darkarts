@@ -8,8 +8,10 @@ const merkleTree = require('fixed-merkle-tree')
 const { initialize } = require('zokrates-js/node')
 const circomlib = require('circomlib') // for mimcSponge
 
+// const circomlibjs = require('circomlibjs')
+// const { utils } = require('ffjavascript')
+
 // not really needed?
-const snarkjs = require('snarkjs') // for toHex
 const BigNumber = require('bignumber.js') // for fromHex?
 
 describe("Vault (e2e test, should be around a minute)", function() {
@@ -68,8 +70,8 @@ describe("Vault (e2e test, should be around a minute)", function() {
         const tokenUidId = result.toString()
 
         // Create deposit commitment object
-        const deposit1 = createDeposit(secretId1, nullifier1, tokenUidContract, tokenUidId)
-        const deposit2 = createDeposit(secretId2, nullifier2, tokenUidContract, tokenUidId)
+        const deposit1 = await createDeposit(secretId1, nullifier1, tokenUidContract, tokenUidId)
+        const deposit2 = await createDeposit(secretId2, nullifier2, tokenUidContract, tokenUidId)
 
         // Approve
         const tokenIdHex = toHex(tokenUidId)
@@ -100,7 +102,7 @@ describe("Vault (e2e test, should be around a minute)", function() {
 // ---
 const mimcSponge = input => circomlib.mimcsponge.multiHash(input, undefined, 1).toString()
 function toHex(number, length = 32) {
-    const str = number instanceof Buffer ? number.toString('hex') : snarkjs.bigInt(number).toString(16)
+    const str = number instanceof Buffer ? number.toString('hex') : BigInt(number).toString(16)
     return '0x' + str.padStart(length * 2, '0')
 }
 
@@ -114,13 +116,20 @@ function readProvingKey(path) {
     return Uint8Array.from(fs.readFileSync(path))
 }
 
-function createDeposit(secretId, nullifier, tokenUidContract, tokenUidId) {
+async function createDeposit(secretId, nullifier, tokenUidContract, tokenUidId) {
     const deposit = { secretId, nullifier, tokenUidContract, tokenUidId }
     
     deposit.publicId = mimcSponge([secretId])
     deposit.nullifierHash = mimcSponge([nullifier])
     deposit.commitment = mimcSponge([nullifier, deposit.publicId, tokenUidId, tokenUidContract])
     // TODO: change order
+    
+    // TODO: circomlibjs outputs buffer, not string or bigint, and it seems to be wrong
+    // const mimcSpongez = await circomlibjs.buildMimcSponge()
+    // const mimcSpongeHash = input => utils.leBuff2int(mimcSpongez.multiHash(input, undefined, 1)).toString()
+    // deposit.publicId = mimcSpongeHash([secretId]) // must be 'affine'?
+    // deposit.nullifierHash = mimcSpongeHash([nullifier])
+    // deposit.commitment = mimcSpongeHash([nullifier, deposit.publicId, tokenUidId, tokenUidContract])
 
     return deposit
 }
@@ -227,7 +236,6 @@ async function generateWithdrawProof(vault, deposit, artifact, provingKey) {
     const depositEvent = events.find(e => e.args.commitment === toHex(deposit.commitment))
     const leafIndex = depositEvent ? depositEvent.args.leafIndex : -1
     await expect(leafIndex).to.be.above(-1, 'The deposit is not found in the tree')
-    // assert(leafIndex >= 0, 'The deposit is not found in the tree')
 
     // Validate that our data is correct
     const root = tree.root()

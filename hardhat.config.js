@@ -9,7 +9,7 @@ require("solidity-coverage");
 
 const path = require('path')
 const fs = require('fs')
-const genContract = require('circomlib/src/mimcsponge_gencontract.js')
+const { mimcSpongecontract } = require('circomlibjs')
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -33,9 +33,9 @@ task("compile", "Compiles the entire project, building all artifacts, ya", async
   const contract = {
     contractName: 'Hasher',
     sourceName: '',
-    abi: genContract.abi,
-    bytecode: genContract.createCode('mimcsponge', 220),
-    deployedBytecode: genContract.createCode('mimcsponge', 220),
+    abi: mimcSpongecontract.abi,
+    bytecode: mimcSpongecontract.createCode('mimcsponge', 220),
+    deployedBytecode: mimcSpongecontract.createCode('mimcsponge', 220),
     linkReferences: {},
     deployedLinkReferences: {} 
   }
