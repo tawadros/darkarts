@@ -7,11 +7,6 @@ const fs = require('fs')
 const merkleTree = require('fixed-merkle-tree')
 const { initialize } = require('zokrates-js/node')
 
-// for mimcSponge
-const circomlib = require('circomlib') 
-// const circomlibjs = require('circomlibjs')
-// const { utils } = require('ffjavascript')
-
 describe("Vault (e2e test, should be around a minute)", function() {
     let vault;
     let token;
@@ -95,7 +90,7 @@ describe("Vault (e2e test, should be around a minute)", function() {
 // ---
 // Util functions
 // ---
-const mimcSponge = input => circomlib.mimcsponge.multiHash(input, undefined, 1).toString()
+// const mimcSponge = input => circomlib.mimcsponge.multiHash(input, undefined, 1).toString()
 function toHex(number, length = 32) {
     const str = number instanceof Buffer ? number.toString('hex') : BigInt(number).toString(16)
     return '0x' + str.padStart(length * 2, '0')
@@ -113,18 +108,26 @@ function readProvingKey(path) {
 
 async function createDeposit(secretId, nullifier, tokenUidContract, tokenUidId) {
     const deposit = { secretId, nullifier, tokenUidContract, tokenUidId }
+
+    oneToOneMimcArtifact = readArtifact(
+        __dirname + "/../build/circuits/1to1mimc/program.bin", 
+        __dirname + "/../build/circuits/1to1mimc/abi.json"
+    )
+
+    fourToOneMimcArtifact = readArtifact(
+        __dirname + "/../build/circuits/4to1mimc/program.bin", 
+        __dirname + "/../build/circuits/4to1mimc/abi.json"
+    )
     
-    deposit.publicId = mimcSponge([secretId])
-    deposit.nullifierHash = mimcSponge([nullifier])
-    deposit.commitment = mimcSponge([nullifier, deposit.publicId, tokenUidId, tokenUidContract])
+    const zokratesProvider = await initialize()
+    // for some reason the output of computeWitness is a string of array
+    const oneToOneMimc = input => JSON.parse(zokratesProvider.computeWitness(oneToOneMimcArtifact, input).output)[0]
+    const fourToOneMimc = input => JSON.parse(zokratesProvider.computeWitness(fourToOneMimcArtifact, input).output)[0]
+    
+    deposit.publicId = oneToOneMimc([secretId])
+    deposit.nullifierHash = oneToOneMimc([nullifier])
     // TODO: change order
-    
-    // TODO: circomlibjs outputs buffer, not string or bigint, and it seems to be wrong
-    // const mimcSpongez = await circomlibjs.buildMimcSponge()
-    // const mimcSpongeHash = input => utils.leBuff2int(mimcSpongez.multiHash(input, undefined, 1)).toString()
-    // deposit.publicId = mimcSpongeHash([secretId]) // must be 'affine'?
-    // deposit.nullifierHash = mimcSpongeHash([nullifier])
-    // deposit.commitment = mimcSpongeHash([nullifier, deposit.publicId, tokenUidId, tokenUidContract])
+    deposit.commitment = fourToOneMimc([nullifier, deposit.publicId, tokenUidId, tokenUidContract])
 
     return deposit
 }

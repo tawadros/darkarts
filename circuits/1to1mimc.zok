@@ -1,6 +1,6 @@
 import "hashes/mimcSponge/mimcSponge" as mimcSponge
 
-def main(private field nullifier) -> field:
-    field[1] preimage = [nullifier]
+def main(private field input) -> field:
+    field[1] preimage = [input]
     field[1] output = mimcSponge(preimage, 0f)
     return output[0]

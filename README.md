@@ -95,3 +95,6 @@ npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
 - Introduce proxy pattern
 - Learn how to deploy to testnet
 - Front end
+
+# Note 
+- Don't use `circomlibjs` for any client operation (mimc hash, proving) because it doesn't support webpack yet

@@ -1,0 +1,6 @@
+import "hashes/mimcSponge/mimcSponge" as mimcSponge
+
+def main(private field input1, private field input2, private field input3, private field input4) -> field:
+    field[4] preimage = [input1, input2, input3, input4]
+    field[1] output = mimcSponge(preimage, 0f)
+    return output[0]
