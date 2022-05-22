@@ -23,7 +23,6 @@
     "@nomiclabs/hardhat-etherscan": "^3.0.3",
     "@nomiclabs/hardhat-waffle": "^2.0.3",
     "@openzeppelin/contracts": "^4.3.3",
-    "bignumber.js": "^9.0.1",
     "chai": "^4.3.6",
     "circomlib": "git+https://github.com/tornadocash/circomlib.git#c372f14d324d57339c88451834bf2824e73bbdbc",
     "circomlibjs": "^0.1.2",

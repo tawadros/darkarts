@@ -6,13 +6,11 @@ const { ethers } = require("hardhat")
 const fs = require('fs')
 const merkleTree = require('fixed-merkle-tree')
 const { initialize } = require('zokrates-js/node')
-const circomlib = require('circomlib') // for mimcSponge
 
+// for mimcSponge
+const circomlib = require('circomlib') 
 // const circomlibjs = require('circomlibjs')
 // const { utils } = require('ffjavascript')
-
-// not really needed?
-const BigNumber = require('bignumber.js') // for fromHex?
 
 describe("Vault (e2e test, should be around a minute)", function() {
     let vault;
@@ -63,10 +61,7 @@ describe("Vault (e2e test, should be around a minute)", function() {
         const secretId2 = "381081628386906533194738143309184053498881367127906410807449526152710014129"
         const nullifier1 = "272418632970930087013102078582984595767243027035861303396446195359448020486"
         const nullifier2 = "218278570709644582400354933544764600979629809596418196314625408049795099009"
-        const vaultAddressHex = vault.address.toLowerCase()
-        const tokenAddressHex = token.address.toLowerCase() // ?
-        const tokenAddressBN = new BigNumber(tokenAddressHex.slice(2), 16)
-        const tokenUidContract = tokenAddressBN.toString(10)
+        const tokenUidContract = BigInt(token.address, 16).toString() // token address in decimal form (needed by MiMC?)
         const tokenUidId = result.toString()
 
         // Create deposit commitment object
@@ -75,11 +70,11 @@ describe("Vault (e2e test, should be around a minute)", function() {
 
         // Approve
         const tokenIdHex = toHex(tokenUidId)
-        await token.connect(addr1).approve(vaultAddressHex, tokenIdHex)
+        await token.connect(addr1).approve(vault.address, tokenIdHex)
 
         // Deposit
         // console.log("Deposit") 
-        let tx = await vault.connect(addr1).deposit(toHex(deposit1.commitment), toHex(tokenUidId), tokenAddressHex)
+        let tx = await vault.connect(addr1).deposit(toHex(deposit1.commitment), toHex(tokenUidId), token.address)
         await expect(tx).to.emit(vault, "Deposit").withArgs(toHex(deposit1.commitment), 0)
 
         // Send
