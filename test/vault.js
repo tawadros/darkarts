@@ -47,9 +47,8 @@ describe("Vault (e2e test, should be around a minute)", function() {
     })
     
     it("e2e test", async function() {
-        // mint token
-        const result = await token.callStatic.awardItem(addr1.address, "Some URI")
-        await token.awardItem(addr1.address, "Some URI")
+        // addr1 has a pre-minted token with tokenId == 1
+        const tokenId = "1"
 
         // String fixtures (for ZoKrates)
         const secretId1 = "254080219567091772673909445246567392088208036796494585251815984474602972369"
@@ -57,15 +56,13 @@ describe("Vault (e2e test, should be around a minute)", function() {
         const nullifier1 = "272418632970930087013102078582984595767243027035861303396446195359448020486"
         const nullifier2 = "218278570709644582400354933544764600979629809596418196314625408049795099009"
         const tokenContract = BigInt(token.address, 16).toString() // token address in decimal form (needed by MiMC?)
-        const tokenId = result.toString()
 
         // Create deposit commitment object
         const deposit1 = await createDeposit(secretId1, nullifier1, tokenContract, tokenId)
         const deposit2 = await createDeposit(secretId2, nullifier2, tokenContract, tokenId)
 
         // Approve
-        const tokenIdHex = toHex(tokenId)
-        await token.connect(addr1).approve(vault.address, tokenIdHex)
+        await token.connect(addr1).approve(vault.address, toHex(tokenId))
 
         // Deposit
         // console.log("Deposit") 

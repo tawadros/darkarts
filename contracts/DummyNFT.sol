@@ -9,7 +9,8 @@ contract DummyNFT is ERC721URIStorage{
     Counters.Counter private _tokenIds;
 
     constructor() ERC721("DummyNFT", "DUM") {
-        // casue of warning: https://github.com/protofire/solhint/issues/242
+        // Pre-minted dummy token for addr1 in Hardhat (not to be confused with addr0)
+        awardItem(0x70997970C51812dc3A010C7d01b50e0d17dc79C8, "Test token #1 for Hardhat"); 
     }
 
     function awardItem(address txAddress, string memory tokenURI) public returns (uint256) {

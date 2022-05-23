@@ -16,7 +16,8 @@
     "build:contracts": "npx hardhat compile",
     "build": "npm run build:circuits && npm run build:contracts",
     "cleanBuild": "npm run clean && npm install && npm run build",
-    "test": "npx hardhat test"
+    "test": "npx hardhat test",
+    "deployLocal": "npx hardhat run scripts/deploy.js --network localhost"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.5",

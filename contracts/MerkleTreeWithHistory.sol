@@ -13,7 +13,7 @@
 pragma solidity ^0.8.0;
 
 interface IHasher {
-  function MiMCSponge(uint256 in_xL, uint256 in_xR, uint256 k) external pure returns (uint256 xL, uint256 xR);
+  function MiMCSponge(uint256 inxL, uint256 inxR, uint256 k) external pure returns (uint256 xL, uint256 xR);
 }
 
 contract MerkleTreeWithHistory {
@@ -35,7 +35,7 @@ contract MerkleTreeWithHistory {
   uint32 public nextIndex = 0;
 
   constructor(uint32 _levels, IHasher _hasher) {
-    require(_levels > 0, "_levels should be greater than zero");
+    require(_levels > 0, "_levels should be greater than 0");
     require(_levels < 32, "_levels should be less than 32");
     levels = _levels;
     hasher = _hasher;
@@ -55,19 +55,19 @@ contract MerkleTreeWithHistory {
     bytes32 _left,
     bytes32 _right
   ) public pure returns (bytes32) {
-    require(uint256(_left) < FIELD_SIZE, "_left should be inside the field");
-    require(uint256(_right) < FIELD_SIZE, "_right should be inside the field");
-    uint256 R = uint256(_left);
-    uint256 C = 0;
-    (R, C) = _hasher.MiMCSponge(R, C, 0);
-    R = addmod(R, uint256(_right), FIELD_SIZE);
-    (R, C) = _hasher.MiMCSponge(R, C, 0);
-    return bytes32(R);
+    require(uint256(_left) < FIELD_SIZE, "_left is too large");
+    require(uint256(_right) < FIELD_SIZE, "_right is too large");
+    uint256 r = uint256(_left);
+    uint256 c = 0;
+    (r, c) = _hasher.MiMCSponge(r, c, 0);
+    r = addmod(r, uint256(_right), FIELD_SIZE);
+    (r, c) = _hasher.MiMCSponge(r, c, 0);
+    return bytes32(r);
   }
 
   function _insert(bytes32 _leaf) internal returns (uint32 index) {
     uint32 _nextIndex = nextIndex;
-    require(_nextIndex != uint32(2)**levels, "Merkle tree is full. No more leaves can be added");
+    require(_nextIndex != uint32(2)**levels, "Merkle tree is full");
     uint32 currentIndex = _nextIndex;
     bytes32 currentLevelHash = _leaf;
     bytes32 left;
