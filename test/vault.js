@@ -56,20 +56,20 @@ describe("Vault (e2e test, should be around a minute)", function() {
         const secretId2 = "381081628386906533194738143309184053498881367127906410807449526152710014129"
         const nullifier1 = "272418632970930087013102078582984595767243027035861303396446195359448020486"
         const nullifier2 = "218278570709644582400354933544764600979629809596418196314625408049795099009"
-        const tokenUidContract = BigInt(token.address, 16).toString() // token address in decimal form (needed by MiMC?)
-        const tokenUidId = result.toString()
+        const tokenContract = BigInt(token.address, 16).toString() // token address in decimal form (needed by MiMC?)
+        const tokenId = result.toString()
 
         // Create deposit commitment object
-        const deposit1 = await createDeposit(secretId1, nullifier1, tokenUidContract, tokenUidId)
-        const deposit2 = await createDeposit(secretId2, nullifier2, tokenUidContract, tokenUidId)
+        const deposit1 = await createDeposit(secretId1, nullifier1, tokenContract, tokenId)
+        const deposit2 = await createDeposit(secretId2, nullifier2, tokenContract, tokenId)
 
         // Approve
-        const tokenIdHex = toHex(tokenUidId)
+        const tokenIdHex = toHex(tokenId)
         await token.connect(addr1).approve(vault.address, tokenIdHex)
 
         // Deposit
         // console.log("Deposit") 
-        let tx = await vault.connect(addr1).deposit(toHex(deposit1.commitment), toHex(tokenUidId), token.address)
+        let tx = await vault.connect(addr1).deposit(toHex(deposit1.commitment), token.address, toHex(tokenId))
         await expect(tx).to.emit(vault, "Deposit").withArgs(toHex(deposit1.commitment), 0)
 
         // Send
@@ -106,8 +106,8 @@ function readProvingKey(path) {
     return Uint8Array.from(fs.readFileSync(path))
 }
 
-async function createDeposit(secretId, nullifier, tokenUidContract, tokenUidId) {
-    const deposit = { secretId, nullifier, tokenUidContract, tokenUidId }
+async function createDeposit(secretId, nullifier, tokenContract, tokenId) {
+    const deposit = { secretId, nullifier, tokenContract, tokenId }
 
     oneToOneMimcArtifact = readArtifact(
         __dirname + "/../build/circuits/1to1mimc/program.bin", 
@@ -127,7 +127,7 @@ async function createDeposit(secretId, nullifier, tokenUidContract, tokenUidId) 
     deposit.publicId = oneToOneMimc([secretId])
     deposit.nullifierHash = oneToOneMimc([nullifier])
     // TODO: change order
-    deposit.commitment = fourToOneMimc([nullifier, deposit.publicId, tokenUidId, tokenUidContract])
+    deposit.commitment = fourToOneMimc([deposit.publicId, nullifier, tokenContract, tokenId])
 
     return deposit
 }
@@ -144,16 +144,16 @@ async function generateSendProof(vault, oldDeposit, newDeposit, artifact, provin
         newDeposit.commitment,
     
         // Private snark inputs
-        oldDeposit.nullifier,
         oldDeposit.secretId,
-        oldDeposit.tokenUidId,
-        oldDeposit.tokenUidContract,
+        oldDeposit.nullifier,
+        oldDeposit.tokenContract,
+        oldDeposit.tokenId,
         pathElements,
         pathIndices.map(Boolean),
-        newDeposit.nullifier,
         newDeposit.publicId,
-        newDeposit.tokenUidId,
-        newDeposit.tokenUidContract,
+        newDeposit.nullifier,
+        newDeposit.tokenContract,
+        newDeposit.tokenId,
     ]
     
     // generate witness and prove
@@ -188,12 +188,12 @@ async function generateWithdrawProof(vault, deposit, artifact, provingKey) {
         // Public snark inputs
         root,
         deposit.nullifierHash,
-        deposit.tokenUidId,
-        deposit.tokenUidContract,
+        deposit.tokenContract,
+        deposit.tokenId,
     
         // Private snark inputs
-        deposit.nullifier,
         deposit.secretId,
+        deposit.nullifier,
         pathElements,
         pathIndices.map(Boolean),
     ]
@@ -207,8 +207,8 @@ async function generateWithdrawProof(vault, deposit, artifact, provingKey) {
     const args = [
         toHex(root),
         toHex(deposit.nullifierHash),
-        toHex(deposit.tokenUidId),
-        toHex(deposit.tokenUidContract)
+        toHex(deposit.tokenContract),
+        toHex(deposit.tokenId)
     ]
 
     return { proof, args }

@@ -37,23 +37,23 @@ contract Vault is MerkleTreeWithHistory, ReentrancyGuard {
 
   /**
     @dev Deposit funds into the contract. The caller must send (for ETH) or approve (for ERC20) value equal to or `denomination` of this instance.
-    @param _commitment the note commitment, which is PedersenHash(nullifier + publicId + tokenId + tokenContract)
-    @param _tokenUidId the tokenId of the submitted NFT
-    @param _tokenUidContract the contract address of the submitted NFT
+    @param _commitment the note commitment, which is MimcHash(publicId || nullifier || tokenContract || tokenId)
+    @param _tokenContract the contract address of the submitted NFT
+    @param _tokenId the tokenId of the submitted NFT
   */
   function deposit(
     bytes32 _commitment,
-    uint256 _tokenUidId,
-    IERC721 _tokenUidContract
+    IERC721 _tokenContract,
+    uint256 _tokenId
   ) external payable nonReentrant {
     require(!commitments[_commitment], "Duplicate commitment");
-    IERC721 tokenContract = _tokenUidContract;
-    require(tokenContract.getApproved(_tokenUidId) == address(this), "You haven't approved us");
+    IERC721 tokenContract = _tokenContract;
+    require(tokenContract.getApproved(_tokenId) == address(this), "You haven't approved us");
 
     uint32 insertedIndex = _insert(_commitment);
     commitments[_commitment] = true;
     
-    tokenContract.transferFrom(msg.sender, address(this), _tokenUidId);
+    tokenContract.transferFrom(msg.sender, address(this), _tokenId);
 
     emit Deposit(_commitment, insertedIndex);
   }
@@ -70,23 +70,23 @@ contract Vault is MerkleTreeWithHistory, ReentrancyGuard {
     WithdrawVerifier.Proof calldata _proof,
     bytes32 _root,
     bytes32 _nullifierHash,
-    bytes32 _tokenUidId,
-    bytes32 _tokenUidContract
+    bytes32 _tokenContract,
+    bytes32 _tokenId
   ) external payable nonReentrant {
     require(!isSpent(_nullifierHash), "The note has been already spent");
     require(isKnownRoot(_root), "Cannot find your merkle root"); // Make sure to use a recent one
     require(
       withdrawVerifier.verifyTx(
         _proof,
-        [uint256(_root), uint256(_nullifierHash), uint256(_tokenUidId), uint256(_tokenUidContract)]
+        [uint256(_root), uint256(_nullifierHash), uint256(_tokenContract), uint256(_tokenId)]
       ),
       "Invalid withdraw proof"
     );
 
     nullifierHashes[_nullifierHash] = true;
 
-    IERC721 tokenContract = IERC721(address(uint160(uint256(_tokenUidContract))));
-    tokenContract.transferFrom(address(this), msg.sender, uint256(_tokenUidId));
+    IERC721 tokenContract = IERC721(address(uint160(uint256(_tokenContract))));
+    tokenContract.transferFrom(address(this), msg.sender, uint256(_tokenId));
 
     emit Withdrawal(_nullifierHash);
   }

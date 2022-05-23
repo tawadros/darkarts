@@ -90,11 +90,10 @@ Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_
 npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
 ```
 # TODO
-- Migrate circomlib to circomlibjs
-    - Currently there's a mismatch in ffjavascript's mimcsponge?
 - Introduce proxy pattern
 - Learn how to deploy to testnet
 - Front end
+    - Figure out how to calculate balance
 
 # Note 
 - Don't use `circomlibjs` for any client operation (mimc hash, proving) because it doesn't support webpack yet
