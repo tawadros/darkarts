@@ -9,6 +9,7 @@ module.exports = {
     "standard",
     "plugin:prettier/recommended",
     "plugin:node/recommended",
+    "plugin:next/core-web-vitals"
   ],
   parserOptions: {
     ecmaVersion: 12,
