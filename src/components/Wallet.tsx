@@ -1,11 +1,17 @@
-import { Button } from "@mantine/core";
 import { Connector, useConnect } from "wagmi";
+import { Button } from "@mantine/core";
+import { showNotification } from "@mantine/notifications";
 
 function Wallet(props: any) {
-	// TODO: this component causes hydration error in dev, but not in start?
+	const errorHandler = (error: Error) => showNotification({
+		title: "Error when Connecting Wallet",
+		message: error.message,
+		color: "red",
+	});
 
-	const { connect, connectors, error, isConnecting, pendingConnector } =
-		useConnect();
+	const { connect, connectors, isConnecting, pendingConnector } = useConnect({
+		onError: errorHandler,
+	});
 
 	return (
 		<div>
@@ -13,19 +19,19 @@ function Wallet(props: any) {
 				<Button
 					variant="light"
 					color="indigo"
-					disabled={!connector.ready}
 					key={connector.id}
 					onClick={() => connect(connector)}
+					disabled={!connector.ready}
 				>
-					{connector.name}
+					{props.account
+						? props.account.address.substring(0, 8) + "..."
+						: connector.name}
 					{!connector.ready && " (unsupported)"}
 					{isConnecting &&
 						connector.id === pendingConnector?.id &&
 						" (connecting)"}
 				</Button>
 			))}
-
-			{error && <div>{error.message}</div>}
 		</div>
 	);
 }

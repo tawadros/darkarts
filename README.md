@@ -16,7 +16,7 @@ We solve this problem by (among many other things) adding a 'send' function that
 
 - `circuits`: ZoKrates circuits
 - `contracts`: Ethereum contracts
-- `src`: frontend
+- `src`: frontend (Next.js)
 - `public`: static file for the frontend
 - `scripts`: various scripts for the project (e.g. deployment, etc.)
 

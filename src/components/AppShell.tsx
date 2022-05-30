@@ -1,16 +1,19 @@
-import { AppShell, Navbar, Header, Group, Text } from "@mantine/core";
-import Wallet from "./Wallet";
-import { useAccount } from "wagmi";
 import React from "react";
+import dynamic from "next/dynamic";
+import { useAccount } from "wagmi";
+
+import { AppShell, Navbar, Header, Group, Text } from "@mantine/core";
 
 function DarkartsAppShell(props: any) {
 	const { data: account } = useAccount();
+
+	const Wallet = dynamic(() => import("./Wallet"));
 
 	const head = (
 		<Header height={60} p="xs">
 			<Group sx={{ height: "100%" }} px={20} position="apart">
 				<Text>Darkarts</Text>
-				<Wallet />
+				<Wallet account={account} />
 			</Group>
 		</Header>
 	);
