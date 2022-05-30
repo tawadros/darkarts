@@ -13,6 +13,8 @@
 pragma solidity ^0.8.0;
 
 interface IHasher {
+  // mixed case name function, but needed for interfacing
+  // solhint-disable-next-line func-name-mixedcase
   function MiMCSponge(uint256 inxL, uint256 inxR, uint256 k) external pure returns (uint256 xL, uint256 xR);
 }
 

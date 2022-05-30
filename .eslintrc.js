@@ -6,10 +6,8 @@ module.exports = {
     node: true,
   },
   extends: [
-    "standard",
-    "plugin:prettier/recommended",
     "plugin:node/recommended",
-    "plugin:next/core-web-vitals"
+    "next"
   ],
   parserOptions: {
     ecmaVersion: 12,
@@ -19,5 +17,12 @@ module.exports = {
       files: ["hardhat.config.js"],
       globals: { task: true },
     },
+    // Fix for devDependencies and unpublished require
+    {
+      files: ["{test,scripts}/**/*.js", "hardhat.config.js"],
+      rules: {
+        "node/no-unpublished-require": 0
+      }
+    }
   ],
 };

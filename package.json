@@ -3,19 +3,23 @@
   "version": "0.2.0",
   "repository": "https://github.com/tawadros/darkarts.git",
   "author": "tawadros <104744090+tawadros@users.noreply.github.com>",
-  "license": "GPLv3",
+  "license": "GPL-3.0-only",
+  "engines" : { 
+    "node" : ">=10.4.0" 
+  },
   "scripts": {
-    "clean": "git clean -fdx",
-    "dev": "next dev",
-    "lint": "next lint",
+    "lint:project": "eslint '**/*.{ts,js}'",
+    "lint:contracts": "solhint 'contracts/**/*.sol'",
+    "lint:frontend": "next lint",
+    "lint": "npm run lint:project && npm run lint:contracts && npm run lint:frontend",
     "build:circuits": "mkdir -p build/circuits/{1to1mimc,4to1mimc,send,withdraw} && node scripts/compileZoKrates.js",
-    "build:contracts": "npx hardhat compile",
+    "build:contracts": "hardhat compile",
     "build:frontend": "next build",
-    "build": "npm run build:circuits && npm run build:contracts",
-    "cleanBuild": "npm run clean && npm install && npm run build",
-    "test:contracts": "npx hardhat test",
-    "start": "next start",
-    "deployLocal": "npx hardhat run scripts/deploy.js --network localhost"
+    "build": "npm run build:circuits && npm run build:contracts && npm run build:frontend",
+    "test:contracts": "hardhat test",
+    "serve:dev": "next dev",
+    "serve:build": "next start",
+    "deploy:contracts:local": "hardhat run scripts/deploy.js --network localhost"
   },
   "dependencies": {
     "@mantine/core": "^4.2.6",
