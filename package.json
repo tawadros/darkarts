@@ -11,11 +11,11 @@
 		"format:project": "prettier '**/*.{ts,js,json,md}' --write",
 		"format:contracts": "prettier 'contracts/**/*.sol' --write",
 		"format:frontend": "prettier 'src/**/*.tsx' --write",
-		"format": "npm run format:project && npm run format:contracts && npm run format:frontend",
+		"format": "concurrently 'npm:format:project' 'npm:format:contracts' 'npm:format:frontend'",
 		"lint:project": "eslint '**/*.{ts,js}'",
 		"lint:contracts": "solhint 'contracts/**/*.sol'",
 		"lint:frontend": "next lint",
-		"lint": "npm run lint:project && npm run lint:contracts && npm run lint:frontend",
+		"lint": "concurrently 'npm:lint:project' 'npm:lint:contracts' 'npm:lint:frontend'",
 		"build:circuits": "mkdir -p build/circuits/{1to1mimc,4to1mimc,send,withdraw} && node scripts/compileZoKrates.js",
 		"build:contracts": "hardhat compile",
 		"build:frontend": "next build",
@@ -23,8 +23,7 @@
 		"test:contracts": "hardhat test",
 		"test": "npm run test:contracts",
 		"deploy:contracts:local": "hardhat run scripts/deploy.js --network localhost",
-		"serve:dev": "next dev",
-		"serve:build": "next start"
+		"dev": "concurrently --kill-others-on-fail -n frontend,eth,deployer 'next dev' 'hardhat node' 'sleep 5 && npm run deploy:contracts:local'"
 	},
 	"dependencies": {
 		"@mantine/core": "^4.2.6",
@@ -47,6 +46,7 @@
 		"@types/react-dom": "18.0.5",
 		"chai": "^4.3.6",
 		"circomlibjs": "^0.1.2",
+		"concurrently": "^7.2.1",
 		"dotenv": "^10.0.0",
 		"eslint": "^7.32.0",
 		"eslint-config-next": "12.1.6",
