@@ -3,3 +3,5 @@ build
 cache
 coverage*
 gasReporterOutput.json
+
+contracts/*Verifier.sol

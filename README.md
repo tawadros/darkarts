@@ -13,6 +13,7 @@ This original flow however, doesn't really work for NFT. The non-fungible nature
 We solve this problem by (among many other things) adding a 'send' function that anonymously changes the rightful withdrawer of the token while keeping the token inside the contract, thus hiding the transaction graph.
 
 ## Structure
+
 - `circuits`: ZoKrates circuits
 - `contracts`: Ethereum contracts
 - `src`: frontend

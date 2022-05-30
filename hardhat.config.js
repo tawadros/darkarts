@@ -7,41 +7,54 @@ require("@nomiclabs/hardhat-waffle");
 require("hardhat-gas-reporter");
 require("solidity-coverage");
 
-const path = require('path')
-const fs = require('fs')
-const { mimcSpongecontract } = require('circomlibjs')
+const path = require("path");
+const fs = require("fs");
+const { mimcSpongecontract } = require("circomlibjs");
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
-  const accounts = await hre.ethers.getSigners();
+	const accounts = await hre.ethers.getSigners();
 
-  for (const account of accounts) {
-    console.log(account.address);
-  }
+	for (const account of accounts) {
+		console.log(account.address);
+	}
 });
 
-task("compile", "Compiles the entire project, building all artifacts, ya", async (taskArgs, hre, runSuper) => {
-  await runSuper(taskArgs);
+task(
+	"compile",
+	"Compiles the entire project, building all artifacts, ya",
+	async (taskArgs, hre, runSuper) => {
+		await runSuper(taskArgs);
 
-  // compile MiMC hasher
-  const outputPath = path.join(__dirname, 'build', 'contracts', 'contracts', 'Hasher.sol')
-  if (!fs.existsSync(outputPath)) {
-    fs.mkdirSync(outputPath)
-  }
+		// compile MiMC hasher
+		const outputPath = path.join(
+			__dirname,
+			"build",
+			"contracts",
+			"contracts",
+			"Hasher.sol"
+		);
+		if (!fs.existsSync(outputPath)) {
+			fs.mkdirSync(outputPath);
+		}
 
-  const contract = {
-    contractName: 'Hasher',
-    sourceName: '',
-    abi: mimcSpongecontract.abi,
-    bytecode: mimcSpongecontract.createCode('mimcsponge', 220),
-    deployedBytecode: mimcSpongecontract.createCode('mimcsponge', 220),
-    linkReferences: {},
-    deployedLinkReferences: {} 
-  }
+		const contract = {
+			contractName: "Hasher",
+			sourceName: "",
+			abi: mimcSpongecontract.abi,
+			bytecode: mimcSpongecontract.createCode("mimcsponge", 220),
+			deployedBytecode: mimcSpongecontract.createCode("mimcsponge", 220),
+			linkReferences: {},
+			deployedLinkReferences: {},
+		};
 
-  fs.writeFileSync(path.join(outputPath, "Hasher.json"), JSON.stringify(contract))
-})
+		fs.writeFileSync(
+			path.join(outputPath, "Hasher.json"),
+			JSON.stringify(contract)
+		);
+	}
+);
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
@@ -50,29 +63,28 @@ task("compile", "Compiles the entire project, building all artifacts, ya", async
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  solidity: "0.8.4",
-  networks: {
-    ropsten: {
-      url: process.env.ROPSTEN_URL || "",
-      accounts:
-        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
-    },
-    hardhat: {
-      chainId: 1337
-    }
-
-  },
-  gasReporter: {
-    enabled: process.env.REPORT_GAS !== undefined,
-    currency: "USD",
-  },
-  etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
-  },
-  mocha: {
-    timeout: 120000
-  },
-  paths: {
-    artifacts: './build/contracts' // unify all the build output to one directory
-  }
+	solidity: "0.8.4",
+	networks: {
+		ropsten: {
+			url: process.env.ROPSTEN_URL || "",
+			accounts:
+				process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+		},
+		hardhat: {
+			chainId: 1337,
+		},
+	},
+	gasReporter: {
+		enabled: process.env.REPORT_GAS !== undefined,
+		currency: "USD",
+	},
+	etherscan: {
+		apiKey: process.env.ETHERSCAN_API_KEY,
+	},
+	mocha: {
+		timeout: 120000,
+	},
+	paths: {
+		artifacts: "./build/contracts", // unify all the build output to one directory
+	},
 };
